@@ -28,13 +28,16 @@ RUN corepack enable
 WORKDIR /app
 
 COPY package.json pnpm*.yaml ./
-COPY backend/package.json backend/pnpm*.yaml ./backend/
+COPY backend/package.json backend/pnpm*.yaml backend/drizzle.config.ts ./backend/
+COPY backend/drizzle ./backend/drizzle
 
 RUN --mount=type=cache,id=pnpm,target=${PNPM_CACHE_DIR} \
     pnpm install --prod --frozen-lockfile --ignore-scripts --store-dir ${PNPM_CACHE_DIR}
+
+RUN pnpm --filter backend rebuild better-sqlite3
 
 COPY --from=builder /app/backend/dist ./backend/dist
 
 EXPOSE 3000
 
-CMD ["pnpm", "--filter", "backend", "start:prod"]
+CMD pnpm --filter backend migrate && pnpm --filter backend start:prod

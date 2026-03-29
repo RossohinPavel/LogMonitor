@@ -7,6 +7,8 @@
 import type { IConnection } from "@nestia/fetcher";
 import { PlainFetcher } from "@nestia/fetcher";
 
+export * as res from "./res/index";
+
 /**
  * @controller AppController.ping
  * @path GET /ping

@@ -36,7 +36,9 @@ async function bootstrap() {
   const document = await NestiaSwaggerComposer.document(app, config);
   SwaggerModule.setup("docs", app, document as OpenAPIObject);
 
-  await app.register(cors);
+  await app.register(cors,{
+    methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS", "PATCH"],
+  });
 
   await app.listen(3000, "0.0.0.0");
 }

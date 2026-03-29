@@ -33,6 +33,12 @@ export default defineConfig(({mode}) => {
           manualChunks(id) {
             // Свои чанки добавлять перед node_modules. 
             // Пример id.includes('b24jssdk'), где b24jssdk - название библиотеки в package.json
+            if (id.includes('@mui')) {
+              return "mui";
+            }
+            if (id.includes('react')) {
+              return "react";
+            } 
             if (id.includes('node_modules')) {
               return 'modules';
             };
