@@ -1,0 +1,23 @@
+{
+  "name": "monorepo-template-v2",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Monorepo Template V2",
+  "author": "dfx_17",
+  "license": "MIT",
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "b": "pnpm --filter backend",
+    "f": "pnpm --filter frontend"
+  },
+  "keywords": [],
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "eslint": "^9.39.4",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import-x": "^4.16.2",
+    "eslint-plugin-unused-imports": "^4.4.1",
+    "typescript-eslint": "^8.57.1"
+  }
+}

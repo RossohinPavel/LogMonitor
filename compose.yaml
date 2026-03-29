@@ -1,0 +1,26 @@
+# Не забудьте указать все аргументы в frontend/Dockerfile.
+x-frontend-build-args: &frontend-args
+  VITE_BACKEND_URL: ${VITE_BACKEND_URL}
+
+services:
+  backend:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - ${BACKEND_PORT}:3000
+    env_file:
+      - ".env"
+
+  frontend:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        <<: *frontend-args
+    ports:
+      - ${FRONTEND_URL}:5173
+    depends_on: 
+      - backend
