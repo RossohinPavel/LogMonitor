@@ -12,6 +12,8 @@ services:
       - ${BACKEND_PORT}:3000
     env_file:
       - ".env"
+    volumes:
+      - ./data:/app/data
 
   frontend:
     restart: unless-stopped
