@@ -1,5 +1,4 @@
 import { IncomingLogDto } from "./logs.types";
-import { LogStat } from "../drizzle/drizzle.schema";
 import { DrizzleService } from "../drizzle/drizzle.service";
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 
@@ -25,7 +24,7 @@ export class LogsService {
   }
 
   getLogsStat(slug: string) {
-    const result = this.orm.getLogsStat(slug) as LogStat[];
+    const result = this.orm.getLogsStat(slug);
     if (!result?.length) {
       throw new NotFoundException(`Resource ${slug} not found.`);
     }

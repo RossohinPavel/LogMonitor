@@ -5,6 +5,7 @@ import { ConfigService } from "@nestjs/config";
 import Database from "better-sqlite3";
 import { eq, sql } from "drizzle-orm";
 import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
+import { LogStat, LogType } from "./drizzle.types";
 
 
 @Injectable()
@@ -14,7 +15,7 @@ export class DrizzleService implements OnModuleDestroy {
   private dirver: Database.Database;
 
   constructor(private readonly config: ConfigService<ConfigType>) {
-    this.dirver = new Database(config.get("dbPath"));
+    this.dirver = new Database(this.config.get("dbPath"));
     // Настройки для sqlite
     this.dirver.pragma("foreign_keys = ON");
     this.dirver.pragma("journal_mode = WAL");
@@ -42,7 +43,7 @@ export class DrizzleService implements OnModuleDestroy {
     return this.db.delete(schema.resources).where(eq(schema.resources.slug, slug));
   }
 
-  createLog(slug: string, type: string, content: string) {
+  createLog(slug: string, type: LogType, content: string) {
     const resourceIdField = sql.identifier(schema.logs.resourceId.name);
     const typeField = sql.identifier(schema.logs.type.name);
     const contentField = sql.identifier(schema.logs.content.name);
@@ -73,14 +74,15 @@ export class DrizzleService implements OnModuleDestroy {
         COUNT(CASE WHEN ${typeField} = 'warning' THEN 1 END) AS warning,
         COUNT(CASE WHEN ${typeField} = 'error' THEN 1 END) AS error
       FROM HoursCTE
-        LEFT JOIN ${schema.logs} ON HoursCTE.hour = (${receivedAtField} - ${receivedAtField} % 3600)
+        LEFT JOIN ${schema.logs} 
+          ON HoursCTE.hour = (${receivedAtField} - ${receivedAtField} % 3600)
         LEFT JOIN ${schema.resources} 
           ON ${schema.logs.resourceId} = ${schema.resources.id}
           AND ${schema.resources.slug} = ${slug}
       GROUP BY hour
       ORDER BY hour
     `;
-    return this.db.all(req);
+    return this.db.all(req) as LogStat[];
   }
 
   // savePingResult(pingResult: INewPing) {
