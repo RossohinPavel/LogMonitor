@@ -29,6 +29,7 @@ export class LogsService {
     if (!result?.length) {
       throw new NotFoundException(`Resource ${slug} not found.`);
     }
+    console.log(result);
     return { resource: slug, time: new Date(), result };
   }
 

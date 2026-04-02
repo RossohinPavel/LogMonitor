@@ -28,9 +28,9 @@ export type SelectLog = InferSelectModel<typeof logs>;
 
 export interface LogStat {
   hour: number
+  log: number
   info: number
   warning: number
-  success: number
   error: number
 } 
 
