@@ -20,6 +20,7 @@ COPY frontend/public/ ./frontend/public/
 COPY frontend/src/ ./frontend/src/
 
 # Объявляем ARG с тем же именем, что и в compose-файле
+ARG VITE_BASE
 ARG VITE_BACKEND_URL
 
 RUN pnpm --filter frontend run build
