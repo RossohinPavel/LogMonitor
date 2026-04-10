@@ -4,12 +4,13 @@ import { findAll } from "../../api/functional/res";
 import type { IConnection } from "../../api/IConnection";
 import { useQuery } from "@tanstack/react-query";
 import { AppContext } from "./context";
+import { env } from "../../config";
 
 
 export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   
   const connection = useRef({
-    host: "http://localhost:3000",
+    host: env.backendUrl,
   } as IConnection);
 
   // Запросы выполняться 1 раз.

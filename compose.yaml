@@ -1,5 +1,6 @@
 # Не забудьте указать все аргументы в frontend/Dockerfile.
 x-frontend-build-args: &frontend-args
+  VITE_BASE: ${VITE_BASE}
   VITE_BACKEND_URL: ${VITE_BACKEND_URL}
 
 services:
