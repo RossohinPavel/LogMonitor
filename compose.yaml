@@ -24,6 +24,6 @@ services:
       args:
         <<: *frontend-args
     ports:
-      - ${FRONTEND_URL}:5173
+      - ${FRONTEND_PORT}:5173
     depends_on: 
       - backend
