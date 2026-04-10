@@ -26,13 +26,6 @@ export const logs = sqliteTable("logs", {
 
 export type SelectLog = InferSelectModel<typeof logs>;
 
-export interface LogStat {
-  hour: number
-  info: number
-  warning: number
-  success: number
-  error: number
-} 
 
 // export const pings = sqliteTable("pings", {
 //   id: integer("id").primaryKey({ autoIncrement: true }),

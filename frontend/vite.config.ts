@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import type { PluginOption } from 'vite';
 import react from '@vitejs/plugin-react';
 import { visualizer } from 'rollup-plugin-visualizer';
+import { env } from "./src/config"
 
 
 const getPlugins = (mode: string) => {
@@ -19,6 +20,7 @@ const getPlugins = (mode: string) => {
 // https://vite.dev/config/
 export default defineConfig(({mode}) => {
   return {
+    base: env.base,
     plugins: getPlugins(mode),
     envDir: "../",
     build: {

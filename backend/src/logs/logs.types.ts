@@ -1,7 +1,4 @@
-import { LogStat } from "../drizzle/drizzle.schema";
-
-
-export type LogType = "info" | "success" | "warning" | "error";
+import { LogStat, LogType } from "../drizzle/drizzle.types";
 
 type JsonPrimitives = string | number | boolean | null;
 type JsonObject = Record<string, unknown>;

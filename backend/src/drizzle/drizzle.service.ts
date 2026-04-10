@@ -5,6 +5,7 @@ import { ConfigService } from "@nestjs/config";
 import Database from "better-sqlite3";
 import { eq, sql } from "drizzle-orm";
 import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
+import { LogStat, LogType } from "./drizzle.types";
 
 
 @Injectable()
@@ -14,7 +15,7 @@ export class DrizzleService implements OnModuleDestroy {
   private dirver: Database.Database;
 
   constructor(private readonly config: ConfigService<ConfigType>) {
-    this.dirver = new Database(config.get("dbPath"));
+    this.dirver = new Database(this.config.get("dbPath"));
     // Настройки для sqlite
     this.dirver.pragma("foreign_keys = ON");
     this.dirver.pragma("journal_mode = WAL");
@@ -42,7 +43,7 @@ export class DrizzleService implements OnModuleDestroy {
     return this.db.delete(schema.resources).where(eq(schema.resources.slug, slug));
   }
 
-  createLog(slug: string, type: string, content: string) {
+  createLog(slug: string, type: LogType, content: string) {
     const resourceIdField = sql.identifier(schema.logs.resourceId.name);
     const typeField = sql.identifier(schema.logs.type.name);
     const contentField = sql.identifier(schema.logs.content.name);
@@ -56,32 +57,32 @@ export class DrizzleService implements OnModuleDestroy {
   }
 
   getLogsStat(slug: string) {
+    const typeField = sql.identifier(schema.logs.type.name);
+    const receivedAtField = sql.identifier(schema.logs.receivedAt.name);
     const req = sql`
-      WITH RECURSIVE
-        HoursCTE(hour) AS (
-          SELECT unixepoch() - (unixepoch() % 3600)
-          UNION ALL
-          SELECT hour - 3600
-          FROM HoursCTE
-          WHERE hour > (unixepoch() - 167 * 3600)
-        ),
-        LogsCTE(received_at, type) AS (
-          SELECT received_at, type
-          FROM logs AS l
-          INNER JOIN resources AS r ON l.resource_id = r.id AND r.slug = ${slug}
-        )
-        SELECT 
-          hour,
-          COUNT(CASE WHEN logs.type = 'info' THEN 1 END) AS info,
-          COUNT(CASE WHEN logs.type = 'warning' THEN 1 END) AS warning,
-          COUNT(CASE WHEN logs.type = 'success' THEN 1 END) AS success,
-          COUNT(CASE WHEN logs.type = 'error' THEN 1 END) AS error
+      WITH RECURSIVE HoursCTE(hour) AS (
+        SELECT unixepoch() - (unixepoch() % 3600)
+        UNION ALL
+        SELECT hour - 3600
         FROM HoursCTE
-        LEFT JOIN logs ON HoursCTE.hour = (logs.received_at - logs.received_at % 3600)
-        GROUP BY hour
-        ORDER BY hour
+        WHERE hour > (unixepoch() - 167 * 3600)
+      )
+      SELECT 
+        hour,
+        COUNT(CASE WHEN ${typeField} = 'log' THEN 1 END) AS log,
+        COUNT(CASE WHEN ${typeField} = 'info' THEN 1 END) AS info,
+        COUNT(CASE WHEN ${typeField} = 'warning' THEN 1 END) AS warning,
+        COUNT(CASE WHEN ${typeField} = 'error' THEN 1 END) AS error
+      FROM HoursCTE
+        LEFT JOIN ${schema.logs} 
+          ON HoursCTE.hour = (${receivedAtField} - ${receivedAtField} % 3600)
+        LEFT JOIN ${schema.resources} 
+          ON ${schema.logs.resourceId} = ${schema.resources.id}
+          AND ${schema.resources.slug} = ${slug}
+      GROUP BY hour
+      ORDER BY hour
     `;
-    return this.db.all(req);
+    return this.db.all(req) as LogStat[];
   }
 
   // savePingResult(pingResult: INewPing) {
